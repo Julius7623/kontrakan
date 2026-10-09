@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Surat Kontrak Rumah</title>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#1f6f5c">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kontrakan">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:#f2f5f4;color:#1b2a27;padding-bottom:env(safe-area-inset-bottom)}
+header{background:#1f6f5c;color:#fff;padding:calc(12px + env(safe-area-inset-top)) 16px 12px;font-weight:700;font-size:18px}
+nav{display:flex;position:sticky;top:0;background:#fff;border-bottom:1px solid #d5dedb;z-index:5}
+nav button{flex:1;padding:14px 4px;border:0;background:none;font-size:15px;font-weight:600;color:#6a7d78}
+nav button.on{color:#1f6f5c;border-bottom:3px solid #1f6f5c}
+main{max-width:820px;margin:auto;padding:14px}
+.tab{display:none}.tab.on{display:block}
+fieldset{background:#fff;border:1px solid #d5dedb;border-radius:14px;margin:0 0 14px;padding:12px 14px}
+legend{font-weight:700;color:#1f6f5c;padding:0 6px}
+label{display:block;font-size:13px;color:#4b5f5a;margin:10px 0 4px}
+input,select,textarea{width:100%;padding:12px;font-size:16px;border:1px solid #c3cfcb;border-radius:10px;background:#fff;font-family:inherit}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{display:block;width:100%;padding:14px;border:0;border-radius:12px;background:#1f6f5c;color:#fff;font-size:16px;font-weight:700;margin:10px 0}
+.btn.o{background:#fff;color:#1f6f5c;border:2px solid #1f6f5c}.btn.r{background:#b3372f}
+.sum{background:#e3f1ec;border-radius:12px;padding:12px;font-size:15px;line-height:1.6}
+.paper{background:#fff;padding:22px 20px;border:1px solid #cfd8d5;font-family:"Times New Roman",serif;font-size:15px;line-height:1.55;text-align:justify}
+.paper h2{text-align:center;margin:0 0 4px;font-size:18px;text-decoration:underline}.paper .c{text-align:center}
+.paper table.k td{padding:1px 6px 1px 0;vertical-align:top}
+.paper h4{text-align:center;margin:14px 0 4px}.paper p{margin:4px 0}
+.sign{display:flex;justify-content:space-between;text-align:center;margin-top:20px}.sign div{width:45%}.sign .sp{height:70px}
+table.inv{width:100%;border-collapse:collapse;margin:12px 0}table.inv th,table.inv td{border:1px solid #444;padding:6px 8px;text-align:left}
+.r2{text-align:right!important}
+.h{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #d5dedb;border-radius:12px;padding:10px;margin-bottom:8px}
+.h div{flex:1}.h button{padding:8px 12px;border-radius:8px;border:1px solid #1f6f5c;background:#fff;color:#1f6f5c;font-weight:600}
+@media print{header,nav,.no{display:none!important}body{background:#fff}main{padding:0;max-width:none}.paper{border:0;padding:0}.tab{display:none!important}.tab.pr{display:block!important}}
+</style></head><body>
+<header>🏠 Surat Kontrak Rumah</header>
+<nav class="no"><button data-t="f" class="on">Isi Data</button><button data-t="s">Surat</button><button data-t="v">Invoice</button><button data-t="h">Riwayat</button></nav>
+<main>
+<div id="f" class="tab on no"><div id="form"></div>
+<div class="sum" id="sum"></div>
+<button class="btn" id="save">💾 Simpan ke Riwayat</button>
+<button class="btn o" id="new">Kosongkan Form (data pemilik tetap)</button></div>
+<div id="s" class="tab"><button class="btn no" onclick="pr('s')">🖨️ Cetak / Simpan PDF</button><div class="paper" id="surat"></div></div>
+<div id="v" class="tab"><button class="btn no" onclick="pr('v')">🖨️ Cetak / Simpan PDF</button><div class="paper" id="inv"></div></div>
+<div id="h" class="tab no"><div id="hist"></div></div>
+</main>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const today=new Date().toISOString().slice(0,10);
+const F=[
+['Data Pemilik (Pihak Pertama) — tersimpan otomatis',[['o_nama','Nama lengkap'],['o_nik','NIK','tel'],['o_alamat','Alamat','textarea'],['o_hp','No. HP','tel'],['o_rek','Rekening pembayaran (opsional, tampil di invoice)']]],
+['Data Penyewa (Pihak Kedua)',[['p_nama','Nama lengkap'],['p_nik','NIK','tel'],['p_ttl','Tempat, tanggal lahir'],['p_kerja','Pekerjaan'],['p_alamat','Alamat sesuai KTP','textarea'],['p_hp','No. HP','tel']]],
+['Objek Sewa',[['r_alamat','Alamat rumah yang dikontrakkan','textarea'],['r_desc','Keterangan rumah (cth: 2 kamar tidur, 1 kamar mandi, listrik 1300 VA)','textarea']]],
+['Jangka Waktu & Biaya',[['mulai','Tanggal mulai sewa','date',today],['dur','Lama sewa','number','1'],['sat','Satuan','select','tahun',['bulan','tahun']],['harga','Harga sewa per satuan (Rp)','number'],['dp','Sudah dibayar / DP (Rp)','number','0'],['cara','Cara pembayaran sisa','text','Dilunasi pada saat penandatanganan surat ini']]],
+['Surat',[['kota','Kota/tempat penandatanganan','text','Gianyar'],['tgl','Tanggal surat','date',today],['saksi1','Nama saksi 1 (opsional)'],['saksi2','Nama saksi 2 (opsional)'],['catat','Catatan tambahan / aturan khusus (opsional)','textarea']]]];
+const OWN=['o_nama','o_nik','o_alamat','o_hp','o_rek'];
+$('#form').innerHTML=F.map(([t,fs])=>`<fieldset><legend>${t}</legend>`+fs.map(([id,l,ty,d,op])=>`<label for="${id}">${l}</label>`+(ty=='textarea'?`<textarea id="${id}" rows="2"></textarea>`:ty=='select'?`<select id="${id}">${op.map(o=>`<option>${o}</option>`).join('')}</select>`:`<input id="${id}" type="${ty||'text'}" ${ty=='number'?'inputmode="numeric" min="0"':''}>`)).join('')+'</fieldset>').join('');
+const ids=F.flatMap(x=>x[1].map(y=>y[0]));
+function setAll(d){ids.forEach(i=>{const f=F.flatMap(x=>x[1]).find(y=>y[0]==i);$('#'+i).value=d[i]??f[3]??''})}
+const ld=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+setAll(Object.assign({},ld('owner')||{}));
+const get=()=>Object.fromEntries(ids.map(i=>[i,$('#'+i).value.trim()]));
+const rp=n=>'Rp '+Math.round(n).toLocaleString('id-ID');
+const sat=['','satu','dua','tiga','empat','lima','enam','tujuh','delapan','sembilan','sepuluh','sebelas'];
+function tb(n){n=Math.floor(n);if(n<12)return sat[n];if(n<20)return tb(n-10)+' belas';if(n<100)return tb(n/10)+' puluh'+(n%10?' '+tb(n%10):'');if(n<200)return 'seratus'+(n%100?' '+tb(n%100):'');if(n<1e3)return tb(n/100)+' ratus'+(n%100?' '+tb(n%100):'');if(n<2e3)return 'seribu'+(n%1e3?' '+tb(n%1e3):'');if(n<1e6)return tb(n/1e3)+' ribu'+(n%1e3?' '+tb(n%1e3):'');if(n<1e9)return tb(n/1e6)+' juta'+(n%1e6?' '+tb(n%1e6):'');return tb(n/1e9)+' miliar'+(n%1e9?' '+tb(n%1e9):'')}
+const rpw=n=>n?tb(n)+' rupiah':'nol rupiah';
+const D=(s,w)=>s?new Date(s+'T00:00:00').toLocaleDateString('id-ID',w?{weekday:'long',day:'numeric',month:'long',year:'numeric'}:{day:'numeric',month:'long',year:'numeric'}):'...';
+function addM(s,m){const d=new Date(s+'T00:00:00'),day=d.getDate();d.setMonth(d.getMonth()+m);if(d.getDate()<day)d.setDate(0);d.setDate(d.getDate()-1);return d.toISOString().slice(0,10)}
+function calc(v){const dur=+v.dur||0,h=+v.harga||0,tot=dur*h,dp=+v.dp||0;const bln=v.sat=='tahun'?dur*12:dur;return{dur,h,tot,dp,sisa:tot-dp,akhir:v.mulai?addM(v.mulai,bln):'',lama:dur+' ('+tb(dur)+') '+v.sat}}
+const B=s=>esc(s)||'................';
+function render(){const v=get(),c=calc(v);
+$('#sum').innerHTML=`Lama: <b>${c.lama}</b><br>Berakhir: <b>${D(c.akhir)}</b><br>Total sewa: <b>${rp(c.tot)}</b><br>Dibayar: ${rp(c.dp)} · Sisa: <b>${rp(c.sisa)}</b>`;
+const row=(a,b)=>`<tr><td>${a}</td><td>:</td><td>${b}</td></tr>`;
+$('#surat').innerHTML=`<h2>SURAT PERJANJIAN SEWA MENYEWA RUMAH</h2><p class="c">Pada hari ini, <b>${D(v.tgl,1)}</b>, bertempat di ${B(v.kota)}, yang bertanda tangan di bawah ini:</p>
+<table class="k">${row('Nama',`<b>${B(v.o_nama)}</b>`)}${row('NIK',B(v.o_nik))}${row('Alamat',B(v.o_alamat))}${row('No. HP',B(v.o_hp))}</table>
+<p>Selanjutnya disebut <b>PIHAK PERTAMA</b> (Pemilik/Yang Menyewakan).</p>
+<table class="k">${row('Nama',`<b>${B(v.p_nama)}</b>`)}${row('NIK',B(v.p_nik))}${row('Tempat/Tgl. Lahir',B(v.p_ttl))}${row('Pekerjaan',B(v.p_kerja))}${row('Alamat (KTP)',B(v.p_alamat))}${row('No. HP',B(v.p_hp))}</table>
+<p>Selanjutnya disebut <b>PIHAK KEDUA</b> (Penyewa).</p>
+<p>Kedua belah pihak sepakat mengadakan perjanjian sewa menyewa rumah dengan ketentuan sebagai berikut:</p>
+<h4>Pasal 1 — Objek Sewa</h4><p>PIHAK PERTAMA menyewakan kepada PIHAK KEDUA sebuah rumah yang terletak di ${B(v.r_alamat)}${v.r_desc?', dengan keterangan: '+esc(v.r_desc):''}, dan PIHAK KEDUA menyatakan menerima sewa rumah tersebut.</p>
+<h4>Pasal 2 — Jangka Waktu</h4><p>Perjanjian sewa berlaku selama <b>${c.lama}</b>, terhitung mulai tanggal <b>${D(v.mulai)}</b> sampai dengan tanggal <b>${D(c.akhir)}</b>.</p>
+<h4>Pasal 3 — Harga dan Pembayaran</h4><p>Harga sewa adalah ${rp(c.h)} per ${esc(v.sat)}, sehingga total sewa sebesar <b>${rp(c.tot)}</b> (<i>${rpw(c.tot)}</i>).${c.dp?` PIHAK KEDUA telah membayar sebesar ${rp(c.dp)} (<i>${rpw(c.dp)}</i>) dan sisanya ${rp(c.sisa)} (<i>${rpw(c.sisa)}</i>): ${esc(v.cara)}.`:` Pembayaran: ${esc(v.cara)}.`} Pembayaran dilakukan kepada PIHAK PERTAMA dan surat ini sekaligus berlaku sebagai tanda terima yang sah.</p>
+<h4>Pasal 4 — Hak dan Kewajiban Pihak Kedua</h4><p>PIHAK KEDUA wajib: (a) merawat rumah dan isinya dengan baik; (b) membayar tagihan listrik, air, kebersihan, dan iuran lingkungan selama masa sewa; (c) tidak mengubah bentuk bangunan tanpa izin tertulis PIHAK PERTAMA; (d) tidak menyewakan kembali atau mengalihkan sewa kepada pihak lain; (e) menggunakan rumah hanya untuk tempat tinggal/keperluan yang sah dan tidak melanggar hukum.</p>
+<h4>Pasal 5 — Kewajiban Pihak Pertama</h4><p>PIHAK PERTAMA menjamin rumah dalam kondisi layak huni, bebas dari sengketa, dan tidak akan mengganggu penggunaan rumah oleh PIHAK KEDUA selama masa sewa.</p>
+<h4>Pasal 6 — Berakhirnya Sewa</h4><p>Pada saat masa sewa berakhir, PIHAK KEDUA wajib mengosongkan dan menyerahkan rumah dalam keadaan baik kepada PIHAK PERTAMA. Perpanjangan sewa dapat dibicarakan paling lambat 30 (tiga puluh) hari sebelum masa sewa berakhir. Kerusakan akibat kelalaian PIHAK KEDUA menjadi tanggung jawab PIHAK KEDUA.</p>
+<h4>Pasal 7 — Penyelesaian Perselisihan</h4><p>Apabila terjadi perselisihan, kedua pihak akan menyelesaikannya secara musyawarah untuk mufakat. Jika tidak tercapai, diselesaikan melalui jalur hukum yang berlaku.</p>
+${v.catat?`<h4>Pasal 8 — Ketentuan Tambahan</h4><p>${esc(v.catat).replace(/\n/g,'<br>')}</p>`:''}
+<p style="margin-top:10px">Demikian surat perjanjian ini dibuat rangkap 2 (dua) bermaterai cukup, masing-masing mempunyai kekuatan hukum yang sama, dan ditandatangani kedua belah pihak dalam keadaan sehat serta tanpa paksaan.</p>
+<p class="c">${B(v.kota)}, ${D(v.tgl)}</p>
+<div class="sign"><div>PIHAK PERTAMA<div class="sp"></div><b><u>${B(v.o_nama)}</u></b></div><div>PIHAK KEDUA<div class="sp"></div><b><u>${B(v.p_nama)}</u></b></div></div>
+${v.saksi1||v.saksi2?`<p class="c" style="margin-top:14px">Saksi-saksi</p><div class="sign"><div><div class="sp" style="height:50px"></div>${esc(v.saksi1)||'..........'}</div><div><div class="sp" style="height:50px"></div>${esc(v.saksi2)||'..........'}</div></div>`:''}`;
+const no='INV-'+(v.tgl||today).replace(/-/g,'')+'-'+((v.p_nama||'X').replace(/\W/g,'').slice(0,3).toUpperCase()||'X');
+$('#inv').innerHTML=`<h2 style="text-decoration:none">INVOICE</h2><p class="c">No. ${no}<br>Tanggal: ${D(v.tgl)}</p>
+<table class="k">${row('Dari',`<b>${B(v.o_nama)}</b><br>${esc(v.o_alamat)}<br>${esc(v.o_hp)}`)}${row('Kepada',`<b>${B(v.p_nama)}</b><br>${esc(v.p_alamat)}<br>${esc(v.p_hp)}`)}</table>
+<table class="inv"><tr><th>Keterangan</th><th class="r2">Jumlah</th><th class="r2">Harga</th><th class="r2">Subtotal</th></tr>
+<tr><td>Sewa rumah ${B(v.r_alamat)}<br><small>${D(v.mulai)} s/d ${D(c.akhir)}</small></td><td class="r2">${c.dur} ${esc(v.sat)}</td><td class="r2">${rp(c.h)}</td><td class="r2">${rp(c.tot)}</td></tr>
+<tr><td colspan="3" class="r2"><b>Total</b></td><td class="r2"><b>${rp(c.tot)}</b></td></tr>
+<tr><td colspan="3" class="r2">Sudah dibayar</td><td class="r2">${rp(c.dp)}</td></tr>
+<tr><td colspan="3" class="r2"><b>Sisa tagihan</b></td><td class="r2"><b>${rp(c.sisa)}</b></td></tr></table>
+<p><i>Terbilang: ${rpw(c.tot)}</i></p><p><b>Status: ${c.sisa<=0&&c.tot>0?'LUNAS':'BELUM LUNAS'}</b></p>${v.o_rek?`<p>Pembayaran ke: ${esc(v.o_rek)}</p>`:''}
+<div class="sign"><div></div><div>Hormat kami,<div class="sp"></div><b><u>${B(v.o_nama)}</u></b></div></div>`}
+function hist(){const h=ld('hist')||[];$('#hist').innerHTML=h.length?h.map((x,i)=>`<div class="h"><div><b>${esc(x.p_nama)||'(tanpa nama)'}</b><br><small>${esc(x.r_alamat).slice(0,40)} · ${D(x.mulai)}</small></div><button onclick="ld2(${i})">Buka</button><button onclick="del(${i})">Hapus</button></div>`).join(''):'<p>Belum ada data tersimpan.</p>'}
+window.ld2=i=>{setAll(ld('hist')[i]);render();tab('f')};window.del=i=>{if(!confirm('Hapus data ini?'))return;const h=ld('hist');h.splice(i,1);sv('hist',h);hist()};
+function tab(t){document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('on',e.id==t));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==t));if(t=='h')hist();scrollTo(0,0)}
+window.pr=t=>{document.querySelectorAll('.tab').forEach(e=>e.classList.remove('pr'));$('#'+t).classList.add('pr');print()};
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.t));
+document.addEventListener('input',()=>{const v=get();sv('owner',Object.fromEntries(OWN.map(k=>[k,v[k]])));render()});
+$('#save').onclick=()=>{const h=ld('hist')||[];h.unshift(get());sv('hist',h.slice(0,200));alert('Tersimpan ✔')};
+$('#new').onclick=()=>{const o=ld('owner')||{};setAll(o);render()};
+render();
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script></body></html>
