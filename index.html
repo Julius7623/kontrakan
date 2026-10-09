@@ -42,7 +42,7 @@ table.inv{width:100%;border-collapse:collapse;margin:12px 0}table.inv th,table.i
 .tt{margin-left:auto;width:min(100%,300px);font-size:14px}.tt div{display:flex;justify-content:space-between;padding:5px 0}.tt .big{background:#1f6f5c;color:#fff;border-radius:12px;padding:12px;font-size:17px;font-weight:800;margin-top:6px}
 .pay{border:2px dashed #9cc3b8;border-radius:12px;padding:10px 12px;margin-top:14px;font-size:14px;line-height:1.5}.ty{text-align:center;color:#6a7d78;font-size:13px;margin-top:16px}
 @media print{.paraf{display:block;position:fixed;bottom:0;right:0;font-size:12px}.iv{border-radius:0}@page{margin:16mm}}
-</style></head><body>
+details.dt{background:#fff;border:1px solid #d5dedb;border-radius:14px;margin:0 0 14px;padding:12px 14px}details.dt summary{font-weight:700;color:#1f6f5c}</style></head><body>
 <header>🏠 Surat Kontrak Rumah</header>
 <nav class="no"><button data-t="f" class="on">Isi Data</button><button data-t="s">Surat</button><button data-t="v">Invoice</button><button data-t="h">Riwayat</button></nav>
 <main>
@@ -60,11 +60,12 @@ const p2=n=>String(n).padStart(2,'0'),iso=d=>d.getFullYear()+'-'+p2(d.getMonth()
 const F=[
 ['Data Pemilik — tersimpan otomatis',[['o_nama','Nama lengkap'],['o_tmp','Tempat lahir'],['o_lhr','Tanggal lahir','date'],['o_kerja','Pekerjaan','text','Wiraswasta'],['o_alamat','Alamat tempat tinggal','textarea'],['o_nik','NIK','tel'],['o_hp','No. HP','tel'],['o_bank','Nama bank','text','PT Bank Negara Indonesia (Persero) Tbk (BNI)'],['o_norek','Nomor rekening','tel'],['o_an','Nama pemilik rekening']]],
 ['Data Penyewa',[['p_nama','Nama lengkap'],['p_tmp','Tempat lahir'],['p_lhr','Tanggal lahir','date'],['p_wn','Kewarganegaraan','select','WNI',['WNI','WNA']],['p_negara','Negara asal (khusus WNA)'],['p_idno','NIK (WNI) / Nomor Paspor (WNA)'],['p_exp','Paspor berlaku sampai (khusus WNA)','date'],['p_kerja','Pekerjaan (WNI)'],['p_alamat','Alamat sesuai KTP (WNI)','textarea'],['p_hp','No. HP','tel']]],
-['Objek Sewa (Rumah)',[['r_lantai','Jumlah lantai','text','1 (satu) lantai'],['r_listrik','Daya listrik PLN (Watt)','number'],['r_air','Sumber air','text','sumur bor'],['r_shm','Nomor Hak Milik tanah'],['r_luas','Luas tanah (m2)','number'],['r_akta','Akta Jual Beli (tanggal & nomor)'],['r_sert','Tanggal sertipikat','date'],['r_lokasi','Lokasi lengkap (Provinsi, Kabupaten, Kecamatan, Desa, Jalan)','textarea']]],
+['Objek Sewa (Rumah)',[['r_lantai','Jumlah lantai','text','1 (satu) lantai'],['r_listrik','Daya listrik PLN (Watt)','number','2200'],['r_air','Sumber air','text','sumur bor'],['r_shm','Nomor Hak Milik tanah','text','03153'],['r_luas','Luas tanah (m2)','number','200'],['r_akta','Akta Jual Beli (tanggal & nomor)','text','tertanggal 27 Maret 2015, Nomor 60/2015'],['r_sert','Tanggal sertipikat','date','2014-12-29'],['r_lokasi','Lokasi lengkap (Provinsi, Kabupaten, Kecamatan, Desa, Jalan)','textarea','Provinsi Bali, Kabupaten Gianyar, Kecamatan Blahbatuh, Desa Saba, setempat dikenal sebagai Jalan Pantai Saba']]],
 ['Jangka Waktu & Biaya',[['mulai','Tanggal mulai sewa','date',today],['dur','Lama sewa','number','1'],['sat','Satuan','select','tahun',['bulan','tahun']],['harga','Harga sewa per satuan (Rp)','number'],['dp','Sudah dibayar (Rp) — untuk invoice','number','0']]],
 ['Surat',[['tgl','Tanggal surat','date',today],['pn','Pengadilan Negeri','text','Denpasar'],['catat','Pasal tambahan (opsional)','textarea']]]];
 const OWN=['o_nama','o_tmp','o_lhr','o_kerja','o_alamat','o_nik','o_hp','o_bank','o_norek','o_an'];
 $('#form').innerHTML=F.map(([t,fs])=>`<fieldset><legend>${t}</legend>`+fs.map(([id,l,ty,d,op])=>`<label for="${id}">${l}</label>`+(ty=='textarea'?`<textarea id="${id}" rows="2"></textarea>`:ty=='select'?`<select id="${id}">${op.map(o=>`<option>${o}</option>`).join('')}</select>`:`<input id="${id}" type="${ty||'text'}" ${ty=='number'?'inputmode="numeric" min="0"':''}>`)).join('')+'</fieldset>').join('');
+{const fs=document.querySelectorAll('#form fieldset')[2],d=document.createElement('details');d.className='dt';d.innerHTML='<summary>🏠 Data rumah — sudah terisi otomatis (ketuk untuk ubah)</summary>';[...fs.children].filter(x=>x.tagName!='LEGEND').forEach(x=>d.append(x));fs.replaceWith(d)}
 const ids=F.flatMap(x=>x[1].map(y=>y[0]));
 function setAll(d){ids.forEach(i=>{const f=F.flatMap(x=>x[1]).find(y=>y[0]==i);$('#'+i).value=d[i]??f[3]??''})}
 const ld=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
